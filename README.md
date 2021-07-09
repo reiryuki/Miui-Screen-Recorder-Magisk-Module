@@ -27,7 +27,6 @@
 ## Credits and contributors
 - Android Ryuki Mods Discussions Team
 - https://t.me/androidryukimodsdiscussions/25188
-- ANXCamera VIP Edition Team
 
 ## Thanks for Donations
 - https://t.me/androidryukimodsdiscussions/2619
