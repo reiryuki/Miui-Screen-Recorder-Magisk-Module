@@ -7,7 +7,7 @@
 - Not in Miui ROM
 - Android 6 until 12
 - Magisk installed
-- Needs disable Android Signature Verification for non-AOSP signatured ROM (READ Troubleshootings!)
+- Need disable Android Signature Verification for non-AOSP signatured ROM (READ Troubleshootings!)
 
 ## Installation Guide
 - Install [Miui Core Magisk Module](https://github.com/reiryuki/Miui-Core-Magisk-Module) first. Tap here: https://github.com/reiryuki/Miui-Core-Magisk-Module
