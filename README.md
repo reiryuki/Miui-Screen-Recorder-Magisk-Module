@@ -3,6 +3,9 @@
 ## Descriptions
 - Miui Screen Recorder app ported from Xiaomi Mi 9 for any Android 6 until 12 non-Miui ROM.
 
+## Screenshots
+- https://t.me/androidryukimods/159
+
 ## Requirements
 - Not in Miui ROM
 - Android 6 until 12
