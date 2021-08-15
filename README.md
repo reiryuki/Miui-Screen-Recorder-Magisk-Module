@@ -1,7 +1,7 @@
 # Miui Screen Recorder Magisk Module
 
 ## Descriptions
-- Miui Screen Recorder app ported from Xiaomi Mi 9 for any Android 6 until 12 non-Miui ROM.
+- Miui Screen Recorder app ported for any Android 6 until 12 non-Miui ROM.
 
 ## Screenshots
 - https://t.me/androidryukimods/159
@@ -10,7 +10,7 @@
 - Not in Miui ROM
 - Android 6 until 12
 - Magisk installed
-- Need disable Android Signature Verification for non-AOSP signatured ROM (READ Troubleshootings!)
+- Need to disable Android Signature Verification for non-AOSP signatured ROM (READ Troubleshootings!)
 
 ## Installation Guide
 - Install [Miui Core Magisk Module](https://github.com/reiryuki/Miui-Core-Magisk-Module) first. Tap here: https://github.com/reiryuki/Miui-Core-Magisk-Module
