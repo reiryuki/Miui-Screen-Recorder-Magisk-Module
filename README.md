@@ -20,8 +20,8 @@
 - Reboot (reboot twice don't reflash, if you have Magisk sepolicy.rule bug, or just turn your device to Permissive if it's still failed.)
 
 ## Tested on
-- CrDroid ROM Android 10 arm64
-- DotOS ROM Android 11 arm64
+- CrDroid ROM Android 10
+- DotOS ROM Android 11
 
 ## Optional
 
