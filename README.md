@@ -16,7 +16,7 @@
 
 ## Installation Guide
 - Install [Miui Core Magisk Module](https://github.com/reiryuki/Miui-Core-Magisk-Module) first. Tap here: https://github.com/reiryuki/Miui-Core-Magisk-Module
-- Install this module via Magisk app only
+- Install this Miui Screen Recorder Magisk Module via Magisk app only (download bellow)
 - If installation failed, READ Troubleshootings!
 - Reboot (reboot twice don't reflash, if you have Magisk sepolicy.rule bug, or just turn your device to Permissive if it's still failed.)
 
