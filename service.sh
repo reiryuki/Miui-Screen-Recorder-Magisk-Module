@@ -1,5 +1,3 @@
-(
-
 MODPATH=${0%/*}
 API=`getprop ro.build.version.sdk`
 
@@ -30,7 +28,7 @@ appops set $PKG READ_MEDIA_IMAGES allow
 appops set $PKG WRITE_MEDIA_AUDIO allow
 appops set $PKG WRITE_MEDIA_VIDEO allow
 appops set $PKG WRITE_MEDIA_IMAGES allow
-if [ "$API" -gt 29 ]; then
+if [ "$API" -ge 30 ]; then
   appops set $PKG MANAGE_EXTERNAL_STORAGE allow
   appops set $PKG NO_ISOLATED_STORAGE allow
   appops set $PKG AUTO_REVOKE_PERMISSIONS_IF_UNUSED ignore
@@ -44,7 +42,5 @@ if [ -f $FILE ]; then
   sh $FILE
   mv -f $FILE $FILE.txt
 fi
-
-) 2>/dev/null
 
 

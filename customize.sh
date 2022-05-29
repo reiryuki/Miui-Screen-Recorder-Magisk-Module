@@ -5,6 +5,13 @@ if [ "$BOOTMODE" != true ]; then
   abort "- Please flash via Magisk Manager only!"
 fi
 
+# magisk
+if [ -d /sbin/.magisk ]; then
+  MAGISKTMP=/sbin/.magisk
+else
+  MAGISKTMP=`find /dev -mindepth 2 -maxdepth 2 -type d -name .magisk`
+fi
+
 # info
 MODVER=`grep_prop version $MODPATH/module.prop`
 MODVERCODE=`grep_prop versionCode $MODPATH/module.prop`
@@ -98,6 +105,16 @@ ui_print " "
 # test
 test_signature
 
+# code
+FILE=$MODPATH/service.sh
+NAME=ro.miui.ui.version.code
+if getprop | grep -Eq "miui.code\]: \[0"; then
+  ui_print "- Removing $NAME..."
+  sed -i "s/resetprop $NAME/#resetprop $NAME/g" $FILE
+  ui_print "  The quick settings tile will not be working."
+  ui_print " "
+fi
+
 # cleaning
 ui_print "- Cleaning..."
 APP="`ls $MODPATH/system/priv-app` `ls $MODPATH/system/app`"
@@ -110,7 +127,6 @@ fi
 for APPS in $APP; do
   rm -f `find /data/dalvik-cache /data/resource-cache -type f -name *$APPS*.apk`
 done
-rm -f $MODPATH/LICENSE
 rm -rf /metadata/magisk/$MODID
 rm -rf /mnt/vendor/persist/magisk/$MODID
 rm -rf /persist/magisk/$MODID
@@ -170,7 +186,7 @@ fi
 # function
 extract_lib() {
 for APPS in $APP; do
-  ui_print "- Extracting $APPS.apk libs..."
+  ui_print "- Extracting..."
   FILE=`find $MODPATH/system -type f -name $APPS.apk`
   DIR=`find $MODPATH/system -type d -name $APPS`/lib/$ARCH
   mkdir -p $DIR
@@ -197,13 +213,23 @@ done
 # hide
 hide_oat
 
+# other
+FILE=$MODPATH/post-fs-data.sh
+if getprop | grep -Eq "other.etc\]: \[1"; then
+  ui_print "- Activating other etc files bind mount..."
+  sed -i 's/#p//g' $FILE
+  ui_print " "
+fi
+
 # permission
 ui_print "- Setting permission..."
 DIR=`find $MODPATH/system/vendor -type d`
 for DIRS in $DIR; do
   chown 0.2000 $DIRS
 done
-if [ "$API" -gt 25 ]; then
+if [ "$API" -ge 26 ]; then
+  magiskpolicy --live "type vendor_file"
+  magiskpolicy --live "type vendor_configs_file"
   magiskpolicy --live "dontaudit { vendor_file vendor_configs_file } labeledfs filesystem associate"
   magiskpolicy --live "allow     { vendor_file vendor_configs_file } labeledfs filesystem associate"
   magiskpolicy --live "dontaudit init { vendor_file vendor_configs_file } dir relabelfrom"

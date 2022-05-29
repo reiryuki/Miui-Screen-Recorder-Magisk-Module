@@ -1,4 +1,8 @@
-# type
+# debug
+magiskpolicy --live "dontaudit system_server system_file file write"
+magiskpolicy --live "allow     system_server system_file file write"
+
+# context
 magiskpolicy --live "type vendor_file"
 magiskpolicy --live "type vendor_configs_file"
 
