@@ -112,7 +112,6 @@ if [ -f $FILE ]; then
   rm -f $FILE
 fi
 
-) 2>/dev/null
 
 
 
