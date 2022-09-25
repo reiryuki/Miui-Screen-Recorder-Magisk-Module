@@ -24,6 +24,9 @@
 - CrDroid ROM Android 10
 - DotOS ROM Android 11
 
+## Known Issue
+- No audio playback while recording with system sounds
+
 ## Troubleshootings & Optionals
 - https://t.me/androidryukimodsdiscussions/64467
 
