@@ -1,16 +1,32 @@
-ui_print " "
-
 # boot mode
 if [ "$BOOTMODE" != true ]; then
   abort "- Please flash via Magisk Manager only!"
+fi
+
+# space
+if [ "$BOOTMODE" == true ]; then
+  ui_print " "
 fi
 
 # magisk
 if [ -d /sbin/.magisk ]; then
   MAGISKTMP=/sbin/.magisk
 else
-  MAGISKTMP=`find /dev -mindepth 2 -maxdepth 2 -type d -name .magisk`
+  MAGISKTMP=`realpath /dev/*/.magisk`
 fi
+
+# path
+if [ "$BOOTMODE" == true ]; then
+  MIRROR=$MAGISKTMP/mirror
+else
+  MIRROR=
+fi
+SYSTEM=`realpath $MIRROR/system`
+PRODUCT=`realpath $MIRROR/product`
+VENDOR=`realpath $MIRROR/vendor`
+SYSTEM_EXT=`realpath $MIRROR/system/system_ext`
+ODM=`realpath /odm`
+MY_PRODUCT=`realpath /my_product`
 
 # optionals
 OPTIONALS=/sdcard/optionals.prop
@@ -34,11 +50,15 @@ else
 fi
 ui_print " "
 
-# sepolicy.rule
+# mount
 if [ "$BOOTMODE" != true ]; then
+  mount -o rw -t auto /dev/block/bootdevice/by-name/cust /vendor
+  mount -o rw -t auto /dev/block/bootdevice/by-name/vendor /vendor
   mount -o rw -t auto /dev/block/bootdevice/by-name/persist /persist
   mount -o rw -t auto /dev/block/bootdevice/by-name/metadata /metadata
 fi
+
+# sepolicy.rule
 FILE=$MODPATH/sepolicy.sh
 DES=$MODPATH/sepolicy.rule
 if [ -f $FILE ] && [ "`grep_prop sepolicy.sh $OPTIONALS`" != 1 ]; then
@@ -48,7 +68,7 @@ if [ -f $FILE ] && [ "`grep_prop sepolicy.sh $OPTIONALS`" != 1 ]; then
 fi
 
 # sdk
-NUM=23
+NUM=21
 if [ "$API" -lt $NUM ]; then
   ui_print "! Unsupported SDK $API."
   ui_print "  You have to upgrade your Android version"
@@ -69,6 +89,21 @@ else
   rm -f /data/adb/modules/MiuiCore/disable
 fi
 
+# cleaning
+ui_print "- Cleaning..."
+PKG=com.miui.screenrecorder
+if [ "$BOOTMODE" == true ]; then
+  for PKGS in $PKG; do
+    RES=`pm uninstall $PKGS`
+  done
+fi
+rm -rf /metadata/magisk/$MODID
+rm -rf /mnt/vendor/persist/magisk/$MODID
+rm -rf /persist/magisk/$MODID
+rm -rf /data/unencrypted/magisk/$MODID
+rm -rf /cache/magisk/$MODID
+ui_print " "
+
 # function
 test_signature() {
 APP=MiuiScreenRecorder
@@ -86,6 +121,7 @@ elif [ -d /data/adb/modules_update/luckypatcher ] || [ -d /data/adb/modules/luck
   ui_print "  Enabling Patches to Android Lucky Patcher Module..."
   rm -f /data/adb/modules/luckypatcher/remove
   rm -f /data/adb/modules/luckypatcher/disable
+  mv -f $MODPATH/disabler.sh.txt $MODPATH/disabler.sh
 elif echo "$RES" | grep -Eq INSTALL_FAILED_SHARED_USER_INCOMPATIBLE; then
   ui_print "  Signature test is failed"
   ui_print "  But installation is allowed for this case"
@@ -95,6 +131,11 @@ elif echo "$RES" | grep -Eq INSTALL_FAILED_SHARED_USER_INCOMPATIBLE; then
 elif echo "$RES" | grep -Eq INSTALL_FAILED_INSUFFICIENT_STORAGE; then
   ui_print "  Please free-up your internal storage first."
   abort
+elif [ "`grep_prop force.install $OPTIONALS`" == 1 ]; then
+  ui_print "  ! Signature test is failed"
+  ui_print "    You need to disable Signature Verification of your"
+  ui_print "    Android first to use this module. READ #troubleshootings!"
+  ui_print "    Or maybe just insufficient storage."
 else
   ui_print "  ! Signature test is failed"
   ui_print "    You need to disable Signature Verification of your"
@@ -118,21 +159,6 @@ if [ "`grep_prop miui.code $OPTIONALS`" == 0 ]; then
   ui_print " "
 fi
 
-# cleaning
-ui_print "- Cleaning..."
-PKG=com.miui.screenrecorder
-if [ "$BOOTMODE" == true ]; then
-  for PKGS in $PKG; do
-    RES=`pm uninstall $PKGS`
-  done
-fi
-rm -rf /metadata/magisk/$MODID
-rm -rf /mnt/vendor/persist/magisk/$MODID
-rm -rf /persist/magisk/$MODID
-rm -rf /data/unencrypted/magisk/$MODID
-rm -rf /cache/magisk/$MODID
-ui_print " "
-
 # features
 PROP=`grep_prop miui.features $OPTIONALS`
 FILE=$MODPATH/system.prop
@@ -153,28 +179,43 @@ else
 fi
 
 # function
+permissive_2() {
+sed -i '1i\
+SELINUX=`getenforce`\
+if [ "$SELINUX" == Enforcing ]; then\
+  magiskpolicy --live "permissive *"\
+fi\' $MODPATH/post-fs-data.sh
+}
 permissive() {
 SELINUX=`getenforce`
 if [ "$SELINUX" == Enforcing ]; then
   setenforce 0
   SELINUX=`getenforce`
   if [ "$SELINUX" == Enforcing ]; then
-    ui_print "  ! Your device can't be turned to Permissive state."
-  fi
-  setenforce 1
-fi
-sed -i '1i\
+    ui_print "  Your device can't be turned to Permissive state."
+    ui_print "  Using Magisk Permissive mode instead."
+    permissive_2
+  else
+    setenforce 1
+    sed -i '1i\
 SELINUX=`getenforce`\
 if [ "$SELINUX" == Enforcing ]; then\
   setenforce 0\
 fi\' $MODPATH/post-fs-data.sh
+  fi
+fi
 }
 
 # permissive
 if [ "`grep_prop permissive.mode $OPTIONALS`" == 1 ]; then
-  ui_print "- Using permissive method"
+  ui_print "- Using device Permissive mode."
   rm -f $MODPATH/sepolicy.rule
   permissive
+  ui_print " "
+elif [ "`grep_prop permissive.mode $OPTIONALS`" == 2 ]; then
+  ui_print "- Using Magisk Permissive mode."
+  rm -f $MODPATH/sepolicy.rule
+  permissive_2
   ui_print " "
 fi
 
@@ -217,17 +258,14 @@ if [ "`grep_prop other.etc $OPTIONALS`" == 1 ]; then
 fi
 
 # permission
-ui_print "- Setting permission..."
-DIR=`find $MODPATH/system/vendor -type d`
-for DIRS in $DIR; do
-  chown 0.2000 $DIRS
-done
 if [ "$API" -ge 26 ]; then
-  chcon -R u:object_r:vendor_file:s0 $MODPATH/system/vendor
-  chcon -R u:object_r:vendor_configs_file:s0 $MODPATH/system/vendor/etc
-  chcon -R u:object_r:vendor_configs_file:s0 $MODPATH/system/vendor/odm/etc
+  ui_print "- Setting permission..."
+  DIR=`find $MODPATH/system/vendor -type d`
+  for DIRS in $DIR; do
+    chown 0.2000 $DIRS
+  done
+  ui_print " "
 fi
-ui_print " "
 
 
 
