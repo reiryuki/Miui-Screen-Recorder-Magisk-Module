@@ -5,7 +5,7 @@
 - The MIT license specified here is for the Magisk Module, not for Miui apps.
 
 ## Descriptions
-- Miui Screen Recorder by Xiaomi Inc. ported and integrated as a Magisk Module for all supported and rooted devices with Magisk
+- Screen Recorder app by Xiaomi Inc. ported and integrated as a Magisk Module for all supported and rooted devices with Magisk
 
 ## Sources
 - apkmirror.com com.miui.screenrecorder Xiaomi Inc.
@@ -32,7 +32,7 @@
 - Android 11 DotOS ROM
 - Android 13 AOSP ROM
 
-## Known Issues
+## Known Issue
 - No audio playback while recording with system sounds
 
 ## Optionals

@@ -1,6 +1,6 @@
 # boot mode
 if [ "$BOOTMODE" != true ]; then
-  abort "- Please flash via Magisk Manager only!"
+  abort "- Please flash via Magisk app only!"
 fi
 
 # space
@@ -24,9 +24,17 @@ fi
 SYSTEM=`realpath $MIRROR/system`
 PRODUCT=`realpath $MIRROR/product`
 VENDOR=`realpath $MIRROR/vendor`
-SYSTEM_EXT=`realpath $MIRROR/system/system_ext`
-ODM=`realpath /odm`
-MY_PRODUCT=`realpath /my_product`
+SYSTEM_EXT=`realpath $MIRROR/system_ext`
+if [ -d $MIRROR/odm ]; then
+  ODM=`realpath $MIRROR/odm`
+else
+  ODM=`realpath /odm`
+fi
+if [ -d $MIRROR/my_product ]; then
+  MY_PRODUCT=`realpath $MIRROR/my_product`
+else
+  MY_PRODUCT=`realpath /my_product`
+fi
 
 # optionals
 OPTIONALS=/sdcard/optionals.prop
@@ -61,7 +69,8 @@ fi
 # sepolicy.rule
 FILE=$MODPATH/sepolicy.sh
 DES=$MODPATH/sepolicy.rule
-if [ -f $FILE ] && [ "`grep_prop sepolicy.sh $OPTIONALS`" != 1 ]; then
+if [ "`grep_prop sepolicy.sh $OPTIONALS`" != 1 ]\
+&& [ -f $FILE ]; then
   mv -f $FILE $DES
   sed -i 's/magiskpolicy --live "//g' $DES
   sed -i 's/"//g' $DES
@@ -106,8 +115,6 @@ ui_print " "
 
 # function
 test_signature() {
-APP=MiuiScreenRecorder
-PKG=com.miui.screenrecorder
 FILE=`find $MODPATH/system -type f -name $APP.apk`
 ui_print "- Testing signature..."
 RES=`pm install -g -i com.android.vending $FILE`
@@ -127,19 +134,19 @@ elif echo "$RES" | grep -Eq INSTALL_FAILED_SHARED_USER_INCOMPATIBLE; then
   ui_print "  But installation is allowed for this case"
   ui_print "  Make sure you have deactivated your Android Signature"
   ui_print "  Verification or the app cannot be installed correctly."
-  ui_print "  If you don't know what it is, please READ #troubleshootings."
+  ui_print "  If you don't know what it is, please READ Troubleshootings!"
 elif echo "$RES" | grep -Eq INSTALL_FAILED_INSUFFICIENT_STORAGE; then
   ui_print "  Please free-up your internal storage first."
   abort
 elif [ "`grep_prop force.install $OPTIONALS`" == 1 ]; then
   ui_print "  ! Signature test is failed"
   ui_print "    You need to disable Signature Verification of your"
-  ui_print "    Android first to use this module. READ #troubleshootings!"
+  ui_print "    Android first to use this module. READ Troubleshootings!"
   ui_print "    Or maybe just insufficient storage."
 else
   ui_print "  ! Signature test is failed"
   ui_print "    You need to disable Signature Verification of your"
-  ui_print "    Android first to use this module. READ #troubleshootings!"
+  ui_print "    Android first to use this module. READ Troubleshootings!"
   ui_print "    Or maybe just insufficient storage."
   abort
 fi
@@ -147,6 +154,8 @@ ui_print " "
 }
 
 # test
+APP=MiuiScreenRecorder
+PKG=com.miui.screenrecorder
 test_signature
 
 # code
@@ -232,13 +241,6 @@ for APPS in $APP; do
   ui_print " "
 done
 }
-
-# extract
-APP="`ls $MODPATH/system/priv-app` `ls $MODPATH/system/app`"
-DES=lib/`getprop ro.product.cpu.abi`/*
-extract_lib
-
-# function
 hide_oat() {
 for APPS in $APP; do
   mkdir -p `find $MODPATH/system -type d -name $APPS`/oat
@@ -246,6 +248,10 @@ for APPS in $APP; do
 done
 }
 
+# extract
+APP="`ls $MODPATH/system/priv-app` `ls $MODPATH/system/app`"
+DES=lib/`getprop ro.product.cpu.abi`/*
+extract_lib
 # hide
 hide_oat
 
