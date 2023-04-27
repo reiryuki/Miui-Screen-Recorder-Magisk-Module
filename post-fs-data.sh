@@ -7,9 +7,9 @@ exec 2>$MODPATH/debug-pfsd.log
 set -x
 
 # run
-FILE=$MODPATH/sepolicy.sh
+FILE=$MODPATH/sepolicy.pfsd
 if [ -f $FILE ]; then
-  . $FILE
+  magiskpolicy --live --apply $FILE
 fi
 
 # context
@@ -119,24 +119,24 @@ if [ "$FILE" ]; then
   sed -i 's/maxFrameRate="60"/maxFrameRate="90"/g' $FILE
 fi
 DIR=$MODPATH/system/vendor
-FILE=`find $DIR/etc -maxdepth 1 -type f -name $NAME`
+FILES=`find $DIR/etc -maxdepth 1 -type f -name $NAME`
 if [ ! -d $ODM ] && [ "`realpath /odm/etc`" == /odm/etc ]\
-&& [ "$FILE" ]; then
-  for i in $FILE; do
-    j="/odm$(echo $i | sed "s|$DIR||")"
-    if [ -f $j ]; then
-      umount $j
-      mount -o bind $i $j
+&& [ "$FILES" ]; then
+  for FILE in $FILES; do
+    DES="/odm$(echo $FILE | sed "s|$DIR||")"
+    if [ -f $DES ]; then
+      umount $DES
+      mount -o bind $FILE $DES
     fi
   done
 fi
 if [ ! -d $MY_PRODUCT ] && [ -d /my_product/etc ]\
-&& [ "$FILE" ]; then
-  for i in $FILE; do
-    j="/my_product$(echo $i | sed "s|$DIR||")"
-    if [ -f $j ]; then
-      umount $j
-      mount -o bind $i $j
+&& [ "$FILES" ]; then
+  for FILE in $FILES; do
+    DES="/my_product$(echo $FILE | sed "s|$DIR||")"
+    if [ -f $DES ]; then
+      umount $DES
+      mount -o bind $FILE $DES
     fi
   done
 fi

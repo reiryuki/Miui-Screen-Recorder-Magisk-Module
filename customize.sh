@@ -4,9 +4,7 @@ if [ "$BOOTMODE" != true ]; then
 fi
 
 # space
-if [ "$BOOTMODE" == true ]; then
-  ui_print " "
-fi
+ui_print " "
 
 # magisk
 if [ -d /sbin/.magisk ]; then
@@ -38,6 +36,9 @@ fi
 
 # optionals
 OPTIONALS=/sdcard/optionals.prop
+if [ ! -f $OPTIONALS ]; then
+  touch $OPTIONALS
+fi
 
 # info
 MODVER=`grep_prop version $MODPATH/module.prop`
@@ -66,14 +67,12 @@ if [ "$BOOTMODE" != true ]; then
   mount -o rw -t auto /dev/block/bootdevice/by-name/metadata /metadata
 fi
 
-# sepolicy.rule
-FILE=$MODPATH/sepolicy.sh
-DES=$MODPATH/sepolicy.rule
-if [ "`grep_prop sepolicy.sh $OPTIONALS`" != 1 ]\
+# sepolicy
+FILE=$MODPATH/sepolicy.rule
+DES=$MODPATH/sepolicy.pfsd
+if [ "`grep_prop sepolicy.sh $OPTIONALS`" == 1 ]\
 && [ -f $FILE ]; then
   mv -f $FILE $DES
-  sed -i 's/magiskpolicy --live "//g' $DES
-  sed -i 's/"//g' $DES
 fi
 
 # sdk
@@ -100,10 +99,10 @@ fi
 
 # cleaning
 ui_print "- Cleaning..."
-PKG=com.miui.screenrecorder
+PKG=`cat $MODPATH/package.txt`
 if [ "$BOOTMODE" == true ]; then
   for PKGS in $PKG; do
-    RES=`pm uninstall $PKGS`
+    RES=`pm uninstall $PKGS 2>/dev/null`
   done
 fi
 rm -rf /metadata/magisk/$MODID
@@ -122,9 +121,10 @@ if [ "$RES" ]; then
   ui_print "  $RES"
 fi
 if [ "$RES" == Success ]; then
-  RES=`pm uninstall -k $PKG`
+  RES=`pm uninstall -k $PKG 2>/dev/null`
   ui_print "  Signature test is passed"
-elif [ -d /data/adb/modules_update/luckypatcher ] || [ -d /data/adb/modules/luckypatcher ]; then
+elif [ -d /data/adb/modules_update/luckypatcher ]\
+|| [ -d /data/adb/modules/luckypatcher ]; then
   ui_print "  Enabling Patches to Android Lucky Patcher Module..."
   rm -f /data/adb/modules/luckypatcher/remove
   rm -f /data/adb/modules/luckypatcher/disable
@@ -133,10 +133,10 @@ elif echo "$RES" | grep -Eq INSTALL_FAILED_SHARED_USER_INCOMPATIBLE; then
   ui_print "  Signature test is failed"
   ui_print "  But installation is allowed for this case"
   ui_print "  Make sure you have deactivated your Android Signature"
-  ui_print "  Verification or the app cannot be installed correctly."
-  ui_print "  If you don't know what it is, please READ Troubleshootings!"
+  ui_print "  Verification, otherwise the app cannot be installed correctly."
+  ui_print "  If you don't know what is it, please READ Troubleshootings!"
 elif echo "$RES" | grep -Eq INSTALL_FAILED_INSUFFICIENT_STORAGE; then
-  ui_print "  Please free-up your internal storage first."
+  ui_print "  Please free-up your internal storage first!"
   abort
 elif [ "`grep_prop force.install $OPTIONALS`" == 1 ]; then
   ui_print "  ! Signature test is failed"
@@ -156,7 +156,9 @@ ui_print " "
 # test
 APP=MiuiScreenRecorder
 PKG=com.miui.screenrecorder
-test_signature
+if ! pm list package | grep -Eq $PKG; then
+  test_signature
+fi
 
 # code
 FILE=$MODPATH/service.sh
@@ -170,20 +172,14 @@ fi
 
 # features
 PROP=`grep_prop miui.features $OPTIONALS`
-FILE=$MODPATH/system.prop
-FILE2=$MODPATH/service.sh
+FILE=$MODPATH/service.sh
 if [ "$PROP" == 0 ]; then
-  ui_print "- Removing ro.product.name changes..."
-  sed -i 's/ro.product.name=cepheus//g' $FILE
-  sed -i 's/resetprop ro.product.miname cepheus//g' $FILE2
+  ui_print "- Removing ro.screenrec.device changes..."
+  sed -i 's/resetprop ro.screenrec.device cepheus//g' $FILE
   ui_print " "
 elif [ "$PROP" ] && [ "$PROP" != 1 ]; then
-  ui_print "- Your ro.product.name will be changed to $PROP"
+  ui_print "- ro.screenrec.device will be changed to $PROP"
   sed -i "s/cepheus/$PROP/g" $FILE
-  sed -i "s/cepheus/$PROP/g" $FILE2
-  ui_print " "
-else
-  ui_print "- Your ro.product.name will be changed to cepheus"
   ui_print " "
 fi
 
@@ -231,14 +227,17 @@ fi
 # function
 extract_lib() {
 for APPS in $APP; do
-  ui_print "- Extracting..."
   FILE=`find $MODPATH/system -type f -name $APPS.apk`
-  DIR=`find $MODPATH/system -type d -name $APPS`/lib/$ARCH
-  mkdir -p $DIR
-  rm -rf $TMPDIR/*
-  unzip -d $TMPDIR -o $FILE $DES
-  cp -f $TMPDIR/$DES $DIR
-  ui_print " "
+  if [ -f `dirname $FILE`/extract ]; then
+    rm -f `dirname $FILE`/extract
+    ui_print "- Extracting..."
+    DIR=`dirname $FILE`/lib/$ARCH
+    mkdir -p $DIR
+    rm -rf $TMPDIR/*
+    unzip -d $TMPDIR -o $FILE $DES
+    cp -f $TMPDIR/$DES $DIR
+    ui_print " "
+  fi
 done
 }
 hide_oat() {

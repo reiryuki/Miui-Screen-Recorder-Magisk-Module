@@ -31,6 +31,7 @@
 - Android 10 CrDroid ROM
 - Android 11 DotOS ROM
 - Android 13 AOSP ROM
+- Android 13 CrDroid ROM
 
 ## Known Issue
 - No audio playback while recording with system sounds
