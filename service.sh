@@ -1,11 +1,13 @@
 MODPATH=${0%/*}
 API=`getprop ro.build.version.sdk`
 
-# debug
+# log
 exec 2>$MODPATH/debug.log
 set -x
 
 # property
+resetprop debug.hwui.renderer opengl
+resetprop debug.renderengine.backend openglthreaded
 resetprop ro.screenrec.device cepheus
 resetprop ro.miui.ui.version.code 14
 
@@ -52,7 +54,7 @@ appops set $PKG PROJECT_MEDIA allow
 appops set $PKG RECORD_AUDIO allow
 appops set $PKG SYSTEM_ALERT_WINDOW allow
 PKGOPS=`appops get $PKG`
-UID=`dumpsys package $PKG 2>/dev/null | grep -m 1 userId= | sed 's/    userId=//'`
+UID=`dumpsys package $PKG 2>/dev/null | grep -m 1 userId= | sed 's|    userId=||g'`
 if [ "$UID" -gt 9999 ]; then
   appops set --uid "$UID" LEGACY_STORAGE allow
   if [ "$API" -ge 29 ]; then
