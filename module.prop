@@ -1,7 +1,7 @@
 id=MiuiScreenRecorder
 name=Miui Screen Recorder
-version=v2.6
-versionCode=16
+version=v2.7
+versionCode=17
 author=Rei Ryuki the Fixer
 description=Screen Recorder app by Xiaomi Inc. ported for any Android 5 and up non-Miui ROM.
 

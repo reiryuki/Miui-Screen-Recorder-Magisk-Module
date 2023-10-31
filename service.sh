@@ -1,9 +1,11 @@
 MODPATH=${0%/*}
-API=`getprop ro.build.version.sdk`
 
 # log
 exec 2>$MODPATH/debug.log
 set -x
+
+# var
+API=`getprop ro.build.version.sdk`
 
 # property
 resetprop debug.hwui.renderer opengl
@@ -50,7 +52,6 @@ if [ "$API" -ge 31 ]; then
 fi
 pm grant $PKG android.permission.RECORD_AUDIO
 appops set $PKG WRITE_SETTINGS allow
-appops set $PKG PROJECT_MEDIA allow
 appops set $PKG RECORD_AUDIO allow
 appops set $PKG SYSTEM_ALERT_WINDOW allow
 PKGOPS=`appops get $PKG`

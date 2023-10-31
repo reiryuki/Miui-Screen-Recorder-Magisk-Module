@@ -1,6 +1,6 @@
 # boot mode
 if [ "$BOOTMODE" != true ]; then
-  abort "- Please flash via Magisk app only!"
+  abort "- Please install via Magisk/KernelSU app only!"
 fi
 
 # space
@@ -11,6 +11,19 @@ if [ "$BOOTMODE" != true ]; then
   FILE=/sdcard/$MODID\_recovery.log
   ui_print "- Log will be saved at $FILE"
   exec 2>$FILE
+  ui_print " "
+fi
+
+# optionals
+OPTIONALS=/sdcard/optionals.prop
+if [ ! -f $OPTIONALS ]; then
+  touch $OPTIONALS
+fi
+
+# debug
+if [ "`grep_prop debug.log $OPTIONALS`" == 1 ]; then
+  ui_print "- The install log will contain detailed information"
+  set -x
   ui_print " "
 fi
 
@@ -46,15 +59,6 @@ else
   ui_print " "
 fi
 
-# bit
-if [ "$IS64BIT" == true ]; then
-  ui_print "- 64 bit"
-else
-  ui_print "- 32 bit"
-  rm -rf `find $MODPATH -type d -name *64*`
-fi
-ui_print " "
-
 # miuicore
 if [ ! -d /data/adb/modules_update/MiuiCore ]\
 && [ ! -d /data/adb/modules/MiuiCore ]; then
@@ -64,12 +68,6 @@ if [ ! -d /data/adb/modules_update/MiuiCore ]\
 else
   rm -f /data/adb/modules/MiuiCore/remove
   rm -f /data/adb/modules/MiuiCore/disable
-fi
-
-# optionals
-OPTIONALS=/sdcard/optionals.prop
-if [ ! -f $OPTIONALS ]; then
-  touch $OPTIONALS
 fi
 
 # sepolicy
@@ -132,8 +130,10 @@ ui_print " "
 # test
 APP=MiuiScreenRecorder
 PKG=com.miui.screenrecorder
-if ! pm list package | grep -q $PKG; then
-  test_signature
+if [ "$BOOTMODE" == true ]; then
+  if ! appops get $PKG > /dev/null 2>&1; then
+    test_signature
+  fi
 fi
 
 # code

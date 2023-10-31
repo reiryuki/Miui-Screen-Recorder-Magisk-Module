@@ -39,12 +39,12 @@
 - No audio playback while recording with system sounds
 
 ## Optionals
-- https://t.me/androidryukimodsdiscussions/60861
 - https://t.me/androidryukimodsdiscussions/54012
+- Global: https://t.me/androidryukimodsdiscussions/60861
 
 ## Troubleshootings
-- https://t.me/androidryukimodsdiscussions/29836
 - https://t.me/androidryukimodsdiscussions/64467
+- Global: https://t.me/androidryukimodsdiscussions/29836
 
 ## Support & Bug Report
 - https://t.me/androidryukimodsdiscussions/2618
