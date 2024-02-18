@@ -6,7 +6,6 @@
 
 ## Descriptions
 - Screen Recorder app by Xiaomi Inc. ported and integrated as a Magisk Module for all supported and rooted devices with Magisk
-- Turns debug.hwui.renderer to opengl and debug.renderengine.backend to openglthreaded because this app doesn't support skiagl (and maybe skiavk)
 
 ## Sources
 - https://apkmirror.com com.miui.screenrecorder by Xiaomi Inc.
@@ -19,7 +18,7 @@
 - Android 5 and up
 - Magisk or KernelSU installed
 - Any AOSP Signatured ROM to grant android.uid.system
-- Disabled Android Signature Verification for non-AOSP Signatured ROM to android.uid.system. Tap here: https://t.me/androidryukimodsdiscussions/58331
+- Disabled Android Signature Verification for non-AOSP Signatured ROM to allow android.uid.system. Tap here: https://t.me/androidryukimodsdiscussions/58331
 - Miui Core Magisk Module
 
 ## Installation Guide & Download Link
@@ -34,6 +33,7 @@
 - Android 10 CrDroid ROM
 - Android 11 DotOS ROM
 - Android 13 AOSP ROM & CrDroid ROM
+- Android 14 LineageOS ROM
 
 ## Known Issue
 - No audio playback while recording with system sounds
@@ -50,14 +50,11 @@
 - https://t.me/androidryukimodsdiscussions/2618
 - If you don't do above, issues will be closed immediately
 
-## Credits and contributors
+## Credits and Contributors
 - https://t.me/androidryukimodsdiscussions
 - You can contribute ideas about this Magisk Module here: https://t.me/androidappsportdevelopment
 
-## Thanks for Donations
-This Magisk Module is always will be free but you can however show us that you are care by making a donations:
-- https://ko-fi.com/reiryuki
-- https://www.paypal.me/reiryuki
+## Sponsors
 - https://t.me/androidryukimodsdiscussions/2619
 
 

@@ -6,16 +6,19 @@ fi
 # space
 ui_print " "
 
+# var
+UID=`id -u`
+
 # log
 if [ "$BOOTMODE" != true ]; then
-  FILE=/sdcard/$MODID\_recovery.log
+  FILE=/data/media/"$UID"/$MODID\_recovery.log
   ui_print "- Log will be saved at $FILE"
   exec 2>$FILE
   ui_print " "
 fi
 
 # optionals
-OPTIONALS=/sdcard/optionals.prop
+OPTIONALS=/data/media/"$UID"/optionals.prop
 if [ ! -f $OPTIONALS ]; then
   touch $OPTIONALS
 fi
@@ -141,7 +144,7 @@ FILE=$MODPATH/service.sh
 NAME=ro.miui.ui.version.code
 if [ "`grep_prop miui.code $OPTIONALS`" == 0 ]; then
   ui_print "- Removing $NAME..."
-  sed -i "s|resetprop $NAME|#resetprop $NAME|g" $FILE
+  sed -i "s|resetprop -n $NAME|#resetprop -n $NAME|g" $FILE
   ui_print "  The quick settings tile will not be working."
   ui_print " "
 fi
@@ -151,7 +154,7 @@ PROP=`grep_prop miui.features $OPTIONALS`
 FILE=$MODPATH/service.sh
 if [ "$PROP" == 0 ]; then
   ui_print "- Removing ro.screenrec.device changes..."
-  sed -i 's|resetprop ro.screenrec.device cepheus||g' $FILE
+  sed -i 's|resetprop -n ro.screenrec.device cepheus||g' $FILE
   ui_print " "
 elif [ "$PROP" ] && [ "$PROP" != 1 ]; then
   ui_print "- ro.screenrec.device will be changed to $PROP"
@@ -159,11 +162,11 @@ elif [ "$PROP" ] && [ "$PROP" != 1 ]; then
   ui_print " "
 fi
 
-# opengl
+# fix renderer
 FILE=$MODPATH/service.sh
-if [ "`grep_prop miui.opengl $OPTIONALS`" == 0 ]; then
-  ui_print "- Does not use opengl props"
-  sed -i 's|resetprop debug|#resetprop debug|g' $FILE
+if [ "`grep_prop miui.fix.renderer $OPTIONALS`" == 1 ]; then
+  ui_print "- Removes debug.hw.renderer if it's using skia"
+  sed -i 's|#r||g' $FILE
   ui_print " "
 fi
 
