@@ -108,7 +108,6 @@ elif [ -d /data/adb/modules_update/luckypatcher ]\
   ui_print "  Enabling Patches to Android Lucky Patcher Module..."
   rm -f /data/adb/modules/luckypatcher/remove
   rm -f /data/adb/modules/luckypatcher/disable
-  mv -f $MODPATH/disabler.sh.txt $MODPATH/disabler.sh
 elif echo "$RES" | grep -q INSTALL_FAILED_SHARED_USER_INCOMPATIBLE; then
   ui_print "  Signature test is failed"
   ui_print "  But installation is allowed for this case"

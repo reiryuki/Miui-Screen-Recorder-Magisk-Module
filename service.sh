@@ -73,14 +73,6 @@ if [ "$UID" ] && [ "$UID" -gt 9999 ]; then
   UIDOPS=`appops get --uid "$UID"`
 fi
 
-# disable
-FILE=$MODPATH/disabler.sh
-if [ -f $FILE ]; then
-  . $FILE
-  mv -f $FILE $FILE.txt
-fi
-
-
 
 
 
