@@ -15,25 +15,20 @@
 
 ## Requirements
 - NOT in Miui ROM
-- Android 5 and up
+- Android 5 (SDK 21) and up
 - Magisk or KernelSU installed
-- Any AOSP Signatured ROM to grant android.uid.system
+- Any AOSP Signatured ROM to allow android.uid.system
 - Disabled Android Signature Verification for non-AOSP Signatured ROM to allow android.uid.system. Tap here: https://t.me/androidryukimodsdiscussions/58331
-- Miui Core Magisk Module
+- Miui Core Magisk Module installed
 
 ## Installation Guide & Download Link
 - Install Miui Core Magisk Module first: https://github.com/reiryuki/Miui-Core-Magisk-Module
 - Install this module https://www.pling.com/p/1547766/ via Magisk app or KernelSU app or Recovery if Magisk installed
 - If installation failed, READ Troubleshootings bellow!
+- If you are using KernelSU, you need to disable Unmount Modules by Default in KernelSU app settings
 - Reboot
-- If you are using KernelSU, you need to allow superuser list manually all package name listed in package.txt (and your home launcher app also) (enable show system apps) and reboot after
-- If you are using SUList, you need to allow list manually your home launcher app (enable show system apps) and reboot after
-
-## Tested on
-- Android 10 CrDroid ROM
-- Android 11 DotOS ROM
-- Android 13 AOSP ROM & CrDroid ROM
-- Android 14 LineageOS ROM
+- If you are using KernelSU, you need to allow superuser list manually all package name listed in package.txt (and your home launcher app also) (enable show system apps) and reboot afterwards
+- If you are using SUList, you need to allow list manually your home launcher app (enable show system apps) and reboot afterwards
 
 ## Known Issue
 - No audio playback while recording with system sounds
@@ -55,6 +50,6 @@
 - You can contribute ideas about this Magisk Module here: https://t.me/androidappsportdevelopment
 
 ## Sponsors
-- https://t.me/androidryukimodsdiscussions/2619
+- https://t.me/ryukinotes/25
 
 

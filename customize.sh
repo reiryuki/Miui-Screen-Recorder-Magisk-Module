@@ -1,6 +1,6 @@
 # boot mode
 if [ "$BOOTMODE" != true ]; then
-  abort "- Please install via Magisk/KernelSU app only!"
+  abort "! Please install via Magisk/KernelSU app only!"
 fi
 
 # space
@@ -8,6 +8,7 @@ ui_print " "
 
 # var
 UID=`id -u`
+[ ! "$UID" ] && UID=0
 
 # log
 if [ "$BOOTMODE" != true ]; then
@@ -28,6 +29,13 @@ if [ "`grep_prop debug.log $OPTIONALS`" == 1 ]; then
   ui_print "- The install log will contain detailed information"
   set -x
   ui_print " "
+fi
+
+# recovery
+if [ "$BOOTMODE" != true ]; then
+  MODPATH_UPDATE=`echo $MODPATH | sed 's|modules/|modules_update/|g'`
+  rm -f $MODPATH/update
+  rm -rf $MODPATH_UPDATE
 fi
 
 # run
@@ -63,8 +71,7 @@ else
 fi
 
 # miuicore
-if [ ! -d /data/adb/modules_update/MiuiCore ]\
-&& [ ! -d /data/adb/modules/MiuiCore ]; then
+if [ ! -d /data/adb/modules/MiuiCore ]; then
   ui_print "! Miui Core Magisk Module is not installed."
   ui_print "  Please read github installation guide!"
   abort
@@ -86,7 +93,10 @@ ui_print "- Cleaning..."
 PKGS=`cat $MODPATH/package.txt`
 if [ "$BOOTMODE" == true ]; then
   for PKG in $PKGS; do
-    RES=`pm uninstall $PKG 2>/dev/null`
+    FILE=`find /data/app -name *$PKG*`
+    if [ "$FILE" ]; then
+      RES=`pm uninstall $PKG 2>/dev/null`
+    fi
   done
 fi
 remove_sepolicy_rule
@@ -121,7 +131,6 @@ else
   ui_print "  ! Signature test is failed"
   ui_print "    You need to disable Signature Verification of your"
   ui_print "    Android first to use this module. READ Troubleshootings!"
-  ui_print "    Or maybe just insufficient storage."
   if [ "`grep_prop force.install $OPTIONALS`" != 1 ]; then
     abort
   fi
@@ -136,16 +145,6 @@ if [ "$BOOTMODE" == true ]; then
   if ! appops get $PKG > /dev/null 2>&1; then
     test_signature
   fi
-fi
-
-# code
-FILE=$MODPATH/service.sh
-NAME=ro.miui.ui.version.code
-if [ "`grep_prop miui.code $OPTIONALS`" == 0 ]; then
-  ui_print "- Removing $NAME..."
-  sed -i "s|resetprop -n $NAME|#resetprop -n $NAME|g" $FILE
-  ui_print "  The quick settings tile will not be working."
-  ui_print " "
 fi
 
 # features

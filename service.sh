@@ -12,12 +12,27 @@ API=`getprop ro.build.version.sdk`
 #r  resetprop --delete debug.hwui.renderer
 #rfi
 resetprop -n ro.screenrec.device cepheus
-resetprop -n ro.miui.ui.version.code 14
 
 # wait
 until [ "`getprop sys.boot_completed`" == 1 ]; do
   sleep 10
 done
+
+# list
+PKGS=`cat $MODPATH/package.txt`
+for PKG in $PKGS; do
+  magisk --denylist rm $PKG 2>/dev/null
+  magisk --sulist add $PKG 2>/dev/null
+done
+if magisk magiskhide sulist; then
+  for PKG in $PKGS; do
+    magisk magiskhide add $PKG
+  done
+else
+  for PKG in $PKGS; do
+    magisk magiskhide rm $PKG
+  done
+fi
 
 # grant
 PKG=com.miui.screenrecorder
