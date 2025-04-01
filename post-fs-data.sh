@@ -85,7 +85,14 @@ for FILE in $FILES; do
 done
 FILES=`find $MODPATH -type f -name $AUD`
 for FILE in $FILES; do
+  sed -i 's|maxFrameRate="15"|maxFrameRate="90"|g' $FILE
+  sed -i 's|maxFrameRate="20"|maxFrameRate="90"|g' $FILE
+  sed -i 's|maxFrameRate="24"|maxFrameRate="90"|g' $FILE
+  sed -i 's|maxFrameRate="25"|maxFrameRate="90"|g' $FILE
+  sed -i 's|maxFrameRate="27"|maxFrameRate="90"|g' $FILE
   sed -i 's|maxFrameRate="30"|maxFrameRate="90"|g' $FILE
+  sed -i 's|maxFrameRate="31"|maxFrameRate="90"|g' $FILE
+  sed -i 's|maxFrameRate="40"|maxFrameRate="90"|g' $FILE
   sed -i 's|maxFrameRate="48"|maxFrameRate="90"|g' $FILE
   sed -i 's|maxFrameRate="60"|maxFrameRate="90"|g' $FILE
 done

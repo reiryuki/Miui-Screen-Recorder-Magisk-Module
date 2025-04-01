@@ -12,6 +12,7 @@ API=`getprop ro.build.version.sdk`
 #r  resetprop --delete debug.hwui.renderer
 #rfi
 resetprop -n ro.screenrec.device cepheus
+resetprop -n ro.screenrec.hevc false
 
 # wait
 until [ "`getprop sys.boot_completed`" == 1 ]; do
@@ -36,6 +37,7 @@ fi
 
 # grant
 PKG=com.miui.screenrecorder
+appops set $PKG GET_USAGE_STATS allow
 pm grant $PKG android.permission.READ_EXTERNAL_STORAGE
 pm grant $PKG android.permission.WRITE_EXTERNAL_STORAGE
 if [ "$API" -ge 29 ]; then
@@ -87,7 +89,6 @@ if [ "$UID" ] && [ "$UID" -gt 9999 ]; then
   fi
   UIDOPS=`appops get --uid "$UID"`
 fi
-
 
 
 
