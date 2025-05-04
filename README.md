@@ -18,7 +18,7 @@
 ## Requirements
 - NOT in Miui ROM
 - Min29 is for Android 10 (SDK 29) and up
-- Min21 is for - Android 5 (SDK 21) and up
+- Min21 is for Android 5 (SDK 21) and up
 - Magisk or KernelSU installed
 - Any AOSP Signatured ROM or disabled Android Signature Verification for non-AOSP Signatured ROM to allow android.uid.system. Tap here: https://t.me/ryukinotes/81
 - Miui Core Magisk Module installed

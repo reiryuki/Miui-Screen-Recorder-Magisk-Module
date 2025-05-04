@@ -240,14 +240,6 @@ if [ "`grep_prop miui.hevc $OPTIONALS`" == 1 ]; then
   ui_print " "
 fi
 
-# fix renderer
-FILE=$MODPATH/service.sh
-if [ "`grep_prop miui.fix.renderer $OPTIONALS`" == 1 ]; then
-  ui_print "- Removes debug.hw.renderer if it's using skia"
-  sed -i 's|#r||g' $FILE
-  ui_print " "
-fi
-
 # function
 permissive_2() {
 sed -i 's|#2||g' $MODPATH/post-fs-data.sh
