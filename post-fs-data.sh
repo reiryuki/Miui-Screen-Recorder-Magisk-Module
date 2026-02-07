@@ -8,17 +8,24 @@ set -x
 # var
 API=`getprop ro.build.version.sdk`
 ABI=`getprop ro.product.cpu.abi`
+if [ -L $MODPATH/system/vendor ]; then
+  mkdir -p $MODPATH/vendor
+fi
+if [ ! -d $MODPATH/vendor ]\
+|| [ -L $MODPATH/vendor ]; then
+  MODSYSTEM=/system
+fi
 
 # function
 permissive() {
-if [ "$SELINUX" == Enforcing ]; then
-  if ! setenforce 0; then
-    echo 0 > /sys/fs/selinux/enforce
-  fi
+if [ "`toybox cat $FILE`" = 1 ]; then
+  chmod 640 $FILE
+  chmod 440 $FILE2
+  echo 0 > $FILE
 fi
 }
 magisk_permissive() {
-if [ "$SELINUX" == Enforcing ]; then
+if [ "`toybox cat $FILE`" = 1 ]; then
   if [ -x "`command -v magiskpolicy`" ]; then
 	magiskpolicy --live "permissive *"
   else
@@ -37,11 +44,12 @@ fi
 }
 
 # selinux
-SELINUX=`getenforce`
-chmod 0755 $MODPATH/*/libmagiskpolicy.so
+FILE=/sys/fs/selinux/enforce
+FILE2=/sys/fs/selinux/policy
 #1permissive
+chmod 0755 $MODPATH/*/libmagiskpolicy.so
 #2magisk_permissive
-#kFILE=$MODPATH/sepolicy.rule
+FILE=$MODPATH/sepolicy.rule
 #ksepolicy_sh
 FILE=$MODPATH/sepolicy.pfsd
 sepolicy_sh
@@ -75,12 +83,7 @@ for FILE in $FILES; do
 done
 FILES=`find /vendor -type f -name $AUD`
 for FILE in $FILES; do
-  if [ -L $MODPATH/system/vendor ]\
-  && [ -d $MODPATH/vendor ]; then
-    MODFILE=$MODPATH$FILE
-  else
-    MODFILE=$MODPATH/system$FILE
-  fi
+  MODFILE=$MODPATH$MODSYSTEM$FILE
   copy_dir_file $FILE $MODFILE
 done
 FILES=`find $MODPATH -type f -name $AUD`
@@ -105,16 +108,9 @@ if [ "$API" -ge 26 ]; then
     chown 0.2000 $DIR
   done
   chcon -R u:object_r:vendor_configs_file:s0 $MODPATH/system/odm/etc
-  if [ -L $MODPATH/system/vendor ]\
-  && [ -d $MODPATH/vendor ]; then
-    chcon -R u:object_r:vendor_file:s0 $MODPATH/vendor
-    chcon -R u:object_r:vendor_configs_file:s0 $MODPATH/vendor/etc
-    chcon -R u:object_r:vendor_configs_file:s0 $MODPATH/vendor/odm/etc
-  else
-    chcon -R u:object_r:vendor_file:s0 $MODPATH/system/vendor
-    chcon -R u:object_r:vendor_configs_file:s0 $MODPATH/system/vendor/etc
-    chcon -R u:object_r:vendor_configs_file:s0 $MODPATH/system/vendor/odm/etc
-  fi
+  chcon -R u:object_r:vendor_file:s0 $MODPATH$MODSYSTEM/vendor
+  chcon -R u:object_r:vendor_configs_file:s0 $MODPATH$MODSYSTEM/vendor/etc
+  chcon -R u:object_r:vendor_configs_file:s0 $MODPATH$MODSYSTEM/vendor/odm/etc
 fi
 
 # function
