@@ -214,7 +214,7 @@ ui_print " "
 APP=MiuiScreenRecorder
 PKG=com.miui.screenrecorder
 if [ "$BOOTMODE" == true ]; then
-  if ! appops get $PKG > /dev/null 2>&1; then
+  if ! appops get $PKG >/dev/null 2>&1; then
     test_signature
   fi
 fi
@@ -327,7 +327,12 @@ rm -f `find $MODPATH/system -type f -name extract`
 # hide
 hide_oat
 
-
+# prepare
+DIR=/storage/emulated/"$UID"/Android/data/com.miui.screenrecorder/files
+ui_print "- Creating directories:"
+ui_print "  $DIR"
+mkdir -p $DIR
+ui_print " "
 
 
 

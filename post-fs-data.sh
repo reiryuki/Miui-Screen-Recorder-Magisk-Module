@@ -5,6 +5,26 @@ MODPATH=${0%/*}
 exec 2>$MODPATH/debug-pfsd.log
 set -x
 
+# function
+set_perm() {
+  chown $2:$3 $1 || return 1
+  chmod $4 $1 || return 1
+  local CON=$5
+  [ -z $CON ] && CON=u:object_r:system_file:s0
+  chcon $CON $1 || return 1
+}
+set_perm_recursive() {
+  find $1 -type d 2>/dev/null | while read dir; do
+    set_perm $dir $2 $3 $4 $6
+  done
+  find $1 -type f -o -type l 2>/dev/null | while read file; do
+    set_perm $file $2 $3 $5 $6
+  done
+}
+
+# permission
+set_perm_recursive $MODPATH 0 0 0755 0644
+
 # var
 API=`getprop ro.build.version.sdk`
 ABI=`getprop ro.product.cpu.abi`
@@ -15,6 +35,10 @@ if [ ! -d $MODPATH/vendor ]\
 || [ -L $MODPATH/vendor ]; then
   MODSYSTEM=/system
 fi
+MOD=/data/adb/modules/nomount
+NM=$MOD/bin/nm
+NOMOUNT=false
+[ ! -f $MOD/disable ] && [ -x $NM ] && $NM v >/dev/null 2>&1 && NOMOUNT=true
 
 # function
 permissive() {
@@ -27,9 +51,9 @@ fi
 magisk_permissive() {
 if [ "`toybox cat $FILE`" = 1 ]; then
   if [ -x "`command -v magiskpolicy`" ]; then
-	magiskpolicy --live "permissive *"
+    magiskpolicy --live "permissive *"
   else
-	$MODPATH/$ABI/libmagiskpolicy.so --live "permissive *"
+    $MODPATH/$ABI/libmagiskpolicy.so --live "permissive *"
   fi
 fi
 }
@@ -74,19 +98,19 @@ copy_dir_file() {
 }
 
 # patch media profiles
-AUD=*media*profiles*.xml
-rm -f `find $MODPATH -type f -name $AUD`
-FILES=`find /system /odm /my_product -type f -name $AUD`
+MED=`cat $MODPATH/media.txt`
+rm -f `find $MODPATH -type f -name $MED`
+FILES=`find /system /odm /my_product -type f -name $MED`
 for FILE in $FILES; do
   MODFILE=$MODPATH/system`echo "$FILE" | sed 's|/system||g'`
   copy_dir_file $FILE $MODFILE
 done
-FILES=`find /vendor -type f -name $AUD`
+FILES=`find /vendor -type f -name $MED`
 for FILE in $FILES; do
   MODFILE=$MODPATH$MODSYSTEM$FILE
   copy_dir_file $FILE $MODFILE
 done
-FILES=`find $MODPATH -type f -name $AUD`
+FILES=`find $MODPATH -type f -name $MED`
 for FILE in $FILES; do
   sed -i 's|maxFrameRate="15"|maxFrameRate="90"|g' $FILE
   sed -i 's|maxFrameRate="20"|maxFrameRate="90"|g' $FILE
@@ -116,23 +140,35 @@ fi
 # function
 mount_odm() {
 DIR=$MODPATH/system/odm
-FILES=`find $DIR -type f -name $AUD`
+FILES=`find $DIR -type f -name $MED`
 for FILE in $FILES; do
   DES=/odm`echo $FILE | sed "s|$DIR||g"`
-  if [ -f $DES ]; then
-    umount $DES
-    mount -o bind $FILE $DES
+  RDES=`realpath $DES`
+  if [ -f $RDES ]; then
+    if $NOMOUNT; then
+      $NM del $RDES 2>/dev/null || true
+      $NM add $RDES $FILE
+    else
+      umount $RDES
+      mount -o bind $FILE $RDES
+    fi
   fi
 done
 }
 mount_my_product() {
 DIR=$MODPATH/system/my_product
-FILES=`find $DIR -type f -name $AUD`
+FILES=`find $DIR -type f -name $MED`
 for FILE in $FILES; do
   DES=/my_product`echo $FILE | sed "s|$DIR||g"`
-  if [ -f $DES ]; then
-    umount $DES
-    mount -o bind $FILE $DES
+  RDES=`realpath $DES`
+  if [ -f $RDES ]; then
+    if $NOMOUNT; then
+      $NM del $RDES 2>/dev/null || true
+      $NM add $RDES $FILE
+    else
+      umount $RDES
+      mount -o bind $FILE $RDES
+    fi
   fi
 done
 }
