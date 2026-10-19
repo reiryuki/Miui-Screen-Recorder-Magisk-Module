@@ -95,8 +95,8 @@ https://t.me/ryukimodsscreenshots/60
 - If you are using KernelSU, you need to disable Unmount Modules by Default in KernelSU app settings and install https://github.com/KernelSU-Modules-Repo/meta-overlayfs or https://github.com/KernelSU-Modules-Repo/magic_mount_rs or https://github.com/KernelSU-Modules-Repo/hybrid_mount or https://github.com/maxsteeel/nomount first depending on ROM compatibility
 - Install Miui Core Magisk Module first: https://github.com/reiryuki/Miui-Core-Magisk-Module
 - Download the right module according to your Android version:
-  - Minimum SDK 29: https://bicolink.com/NV4
-  - Minimum SDK 21: https://bicolink.com/a991BSal
+  - Minimum SDK 29: https://move2link.co/a72ec04
+  - Minimum SDK 21: https://move2link.co/0e251aa
 - Install the module via Magisk app or Kitsune Mask app or KernelSU app or Apatch app or Recovery if Magisk or Kitsune Mask installed
 - If installation failed, READ Troubleshootings bellow!
 - Reboot
